@@ -6,6 +6,7 @@ import com.happyworld.fooservice.exceptions.FooServiceException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -16,18 +17,23 @@ public class FooControllerAdvice
 
     private final static Logger LOGGER = LoggerFactory.getLogger( FooControllerAdvice.class );
 
-    @ExceptionHandler( FooServiceException.class )
-    public ResponseEntity<ApiErrorDto> handleBarException( FooServiceException ex )
+    //Log Root Cause if available otherwise log all trace
+    private static void logError( FooServiceException ex )
     {
-        //Log Root Cause
-        var rootCause = ExceptionUtils.getRootCause( ex );
-        LOGGER.error( rootCause.getMessage(), rootCause );
+        var rootCause = NestedExceptionUtils.getMostSpecificCause( ex );
+        LOGGER.error( ExceptionUtils.getMessage( ex ), rootCause );
+    }
+
+    @ExceptionHandler( FooServiceException.class )
+    public ResponseEntity<ApiErrorDto> handleFooServiceException( FooServiceException ex )
+    {
+
+        logError( ex );
 
         //Evaluate Response code to send
-        Throwable cause = ex.getCause();
         var errorDto = new ApiErrorDto();
 
-        if ( cause instanceof BarServiceException )
+        if ( ex.getCause() instanceof BarServiceException )
         {
 
             errorDto.setCode( "BAD_REQUEST" );

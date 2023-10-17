@@ -4,6 +4,7 @@ import com.happyworld.fooservice.dto.ApiErrorDto;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -27,8 +28,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<Object> handleMethodArgumentNotValid( MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request )
     {
         //LOG Root cause
-        var rootCause = ExceptionUtils.getRootCause( ex );
-        LOGGER.error( rootCause.getMessage(), rootCause );
+        var rootCause = NestedExceptionUtils.getMostSpecificCause( ex );
+        LOGGER.error( ExceptionUtils.getMessage( ex ), rootCause );
 
         var errors = new HashMap<String, List<ApiErrorDto>>();
         var errorList = getErrorList( ex );

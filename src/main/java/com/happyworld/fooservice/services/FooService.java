@@ -37,7 +37,7 @@ public class FooService
         }
         catch ( DataAccessException ex )
         {
-            throw new FooServiceException( String.format( "Error getting foo values id: %s", id ), ex );
+            throw new FooServiceException( "Error getting foo values", ex );
         }
     }
 
@@ -58,6 +58,7 @@ public class FooService
     {
         try
         {
+            this.fooRepository.findAll();
             this.barService.settingUpBar();
         }
         catch ( DataAccessException | BarServiceException ex )

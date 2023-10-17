@@ -7,4 +7,9 @@ public class FooServiceException extends RuntimeException
     {
         super( message, cause );
     }
+
+    public FooServiceException()
+    {
+
+    }
 }
